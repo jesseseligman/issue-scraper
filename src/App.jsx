@@ -23,11 +23,21 @@ class App extends Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind(this);
     this.fetchIssues = this.fetchIssues.bind(this);
   }
 
   handleChange(e) {
+    console.log(e.target.value);
     this.setState({ repoUrl: e.target.value });
+  }
+
+  handleKeyPress(event) {
+    if (event.key !== 'Enter') {
+      return;
+    }
+    this.fetchIssues();
+    event.preventDefault();
   }
 
   fetchIssues(issues = [], page = 1) {
@@ -125,6 +135,7 @@ class App extends Component {
                 value={this.state.repoUrl}
                 placeholder="Repository URL"
                 onChange={this.handleChange}
+                onKeyPress={this.handleKeyPress}
               />
               <div>{this.state.errorMessage}</div>
             </FormGroup>
