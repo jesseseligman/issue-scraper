@@ -28,7 +28,6 @@ class App extends Component {
   }
 
   handleChange(e) {
-    console.log(e.target.value);
     this.setState({ repoUrl: e.target.value });
   }
 
@@ -41,10 +40,15 @@ class App extends Component {
   }
 
   fetchIssues(issues = [], page = 1) {
+    // Very basic validation on input
     if (!this.state.repoUrl.includes('github.com')) {
       return this.setState({ error: true });
     }
+
+    // Update state to show loader
     this.setState({ error: false, fetching: true });
+
+    // Parse repo path from input url
     const repo = this.state.repoUrl.split('github.com/')[1];
 
     const config = {
@@ -61,11 +65,15 @@ class App extends Component {
 
     axios(config)
     .then((res) => {
+      // Update total issues and filter out pull requests
       issues = issues.concat(removePullRequests(res.data));
 
+      // Check to see if more requests need to be made. All paginated requests will have a Link header, and all paginated requests except for the last one will have a last key
       if (res.headers.link && parse(res.headers.link).last) {
         return this.fetchIssues(issues, page + 1);
       }
+
+      // Once all requests have been made, sort issues and update state
 
       const nextIssues = issueAgeBreakdown(issues);
 
@@ -84,6 +92,7 @@ class App extends Component {
   render() {
     const { newIssues, middleIssues, oldIssues, total } = this.state.issues;
     const hidden = { display: 'none' };
+
     return (
       <div >
         <div className="container">
